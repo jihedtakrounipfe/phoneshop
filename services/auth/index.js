@@ -5,15 +5,17 @@ require('dotenv').config();
 const app = express();
 app.use(express.json());
 
-// Routes
+// Import routes
 const authRoutes = require('./routes/auth.routes');
-app.use('/api/auth', authRoutes);
+const userRoutes = require('./routes/user.routes');
 
-// DB + Server
+app.use('/api/auth', authRoutes);
+app.use('/api', userRoutes);
+
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     app.listen(process.env.PORT, () =>
       console.log(`Auth Service running on port ${process.env.PORT}`)
     );
   })
-  .catch(err => console.log(err));
+  .catch(err => console.error(err));
