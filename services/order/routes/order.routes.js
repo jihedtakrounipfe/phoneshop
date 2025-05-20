@@ -1,5 +1,5 @@
 const path = require('path');
-const verifyToken = require(path.resolve('C:/Users/Jihed Takrouni/Desktop/phone-shop/shared-utils/verifyToken.js')); // Absolute path usage
+const verifyToken = require('../shared-utils/verifyToken');
 
 const express = require('express');
 const { addOrder, getUserOrders } = require('../controllers/order.controller');
