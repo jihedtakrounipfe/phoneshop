@@ -1,7 +1,6 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 
-// Récupérer tous les utilisateurs (admin uniquement)
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.find().select('-password');
@@ -11,7 +10,6 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
-// Récupérer un utilisateur par ID (admin ou utilisateur lui-même)
 exports.getUserById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -29,7 +27,6 @@ exports.getUserById = async (req, res) => {
   }
 };
 
-// Mettre à jour un utilisateur (admin ou utilisateur lui-même)
 exports.updateUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -39,8 +36,14 @@ exports.updateUser = async (req, res) => {
     }
 
     const updates = req.body;
+
     if (updates.password) {
       updates.password = await bcrypt.hash(updates.password, 10);
+    }
+
+    // Sécurité : empêcher un client normal de changer son rôle
+    if (req.user.role !== 'admin') {
+      delete updates.role;
     }
 
     const updatedUser = await User.findByIdAndUpdate(id, updates, { new: true }).select('-password');
@@ -52,11 +55,11 @@ exports.updateUser = async (req, res) => {
   }
 };
 
-// Supprimer un utilisateur (admin uniquement)
 exports.deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
 
+    // Seulement admin peut supprimer (à vérifier dans le middleware)
     const deletedUser = await User.findByIdAndDelete(id);
     if (!deletedUser) return res.status(404).json({ message: 'Utilisateur non trouvé' });
 
